@@ -12,7 +12,7 @@ esphome:
     version: "1.0.0"
 
 dashboard_import:
-  package_import_url: github://wjtje/lsc-smart-connect-esphome/power-plug/power-plug-template.yaml@v1
+  package_import_url: github://wjtje/lsc-smart-connect-esphome/power-plug/power-plug-template.yaml@main
   import_full_config: false
 
 external_components:
