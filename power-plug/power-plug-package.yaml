@@ -1,6 +1,11 @@
 substitutions:
   name: "lsc-power-plug"
   friendly_name: "LSC Power Plug"
+  encryption_key: "y2cMsHkS9oyR8cpyCiKL1ZQTz84a4zmpumGUQYbWJjE="
+  ota_password: "4978151e1fb09da97cbd67b0da8e021e"
+  wifi_ssid: !secret wifi_ssid
+  wifi_password: !secret wifi_password
+  ap_password: "BTtfZPbLWcpg"
 
 esphome:
   name: ${name}
@@ -11,10 +16,6 @@ esphome:
     name: "wjtje.lsc-power-plug"
     version: "1.0.0"
 
-dashboard_import:
-  package_import_url: github://wjtje/lsc-smart-connect-esphome/power-plug/power-plug-template.yaml@main
-  import_full_config: false
-
 external_components:
   - source:
       type: git
@@ -23,18 +24,22 @@ external_components:
     components: [ pulse_counter ]
 
 api:
+  encryption:
+    key: ${friendly_name}
 
 ota:
+  password: ${ota_password}
 
-# Setup a WIFI AP so the the user can setup the device
 wifi:
+  ssid: ${wifi_ssid}
+  password: ${wifi_password}
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    password: "12345678"
+    ssid: ${friendly_name}
+    password: ${ap_password}
 
 captive_portal:
-
-web_server:
-  port: 80
 
 bk72xx:
   board: cb2s
