@@ -25,7 +25,7 @@ external_components:
 
 api:
   encryption:
-    key: ${friendly_name}
+    key: ${encryption_key}
 
 ota:
   password: ${ota_password}

@@ -86,7 +86,7 @@ substitutions:
   ap_password: ""
 
 packages:
-  power-plug: github://wjtje/lsc-smart-connect-esphome/power-plug/power-plug-package.yml@main
+  power-plug: github://wjtje/lsc-smart-connect-esphome/power-plug/power-plug-package.yaml@main
 ```
 
 ## License
