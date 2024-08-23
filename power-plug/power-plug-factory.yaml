@@ -1,0 +1,142 @@
+substitutions:
+  name: "lsc-power-plug"
+  friendly_name: "LSC Power Plug"
+ 
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: true
+
+  project:
+    name: "wjtje.lsc-power-plug"
+    version: "1.0.1"
+
+dashboard_import:
+  package_import_url: github://wjtje/lsc-smart-connect-esphome/power-plug/power-plug-template.yaml@main
+  import_full_config: true
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/wjtje/esphome
+      ref: lsc-power-monitoring-fix
+    components: [ pulse_counter ]
+
+api:
+
+ota:
+  - platform: esphome
+
+# Setup a WIFI AP so the the user can setup the device
+wifi:
+  ap:
+    password: "12345678"
+
+captive_portal:
+
+web_server:
+  port: 80
+
+bk72xx:
+  board: cb2s
+
+# Enable logging (on LOG UART)
+logger:
+  hardware_uart: UART2
+
+# The relay on the device (e.g. the whole point of this device)
+switch:
+  - id: rl1
+    name: "Output"
+    platform: gpio
+    pin: 8
+    device_class: outlet
+    # Bind the led1 to the relay status
+    on_turn_on:
+      - if:
+          condition:
+            switch.is_on: c1
+          then:
+            - light.turn_on: led1
+    on_turn_off:
+      - light.turn_off: led1
+  # Config for the status led
+  - id: c1
+    name: "Status Light"
+    platform: template
+    entity_category: config
+    icon: mdi:led-on
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    turn_on_action:
+      - if:
+          condition:
+            switch.is_on: rl1
+          then:
+            - light.turn_on: led1
+    turn_off_action:
+      - light.turn_off: led1
+  # Config for the button
+  - id: c2
+    name: "Button Control"
+    platform: template
+    entity_category: config
+    icon: mdi:gesture-tap
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+
+# The button on the devices toggles the Relay
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: 7
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    id: bt1
+    filters:
+      - delayed_on_off: 10ms # Debounce button
+    on_press:
+      if:
+        condition:
+          switch.is_on: c2
+        then:
+          - switch.toggle: rl1
+
+# The Blue LED is used for status
+status_led:
+  pin: 10
+
+# The Red LED indicates Relay status
+light:
+  - platform: binary
+    output: led1_pin
+    id: led1
+
+output:
+  - id: led1_pin
+    platform: gpio
+    pin: 6
+
+# Energy monitoring
+sensor:
+  - platform: hlw8012
+    model: BL0937
+    current_resistor: 0.0011
+    voltage_divider: 1661.8
+    change_mode_every: 2
+    sel_pin:
+      number: 11
+      inverted: true
+    cf_pin: 26
+    cf1_pin: 24
+    current:
+      name: "Current"
+    voltage:
+      name: "Voltage"
+    power:
+      name: "Power"
+    energy:
+      name: "Energy"
+    update_interval: 5s

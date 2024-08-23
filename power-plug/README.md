@@ -71,24 +71,6 @@ external_components:
     components: [ pulse_counter ]
 ```
 
-## Example yaml
-
-This is a basic YAML file you can use to create your own firmware
-
-```yaml
-substitutions:
-  name: "lsc-power-plug"
-  friendly_name: "LSC Power Plug"
-  encryption_key: ""
-  ota_password: ""
-  wifi_ssid: !secret wifi_ssid
-  wifi_password: !secret wifi_password
-  ap_password: ""
-
-packages:
-  power-plug: github://wjtje/lsc-smart-connect-esphome/power-plug/power-plug-package.yaml@main
-```
-
 ## License
 
 The MIT License (MIT) - Copyright (c) 2024 Wouter van der Wal

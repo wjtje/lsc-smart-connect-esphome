@@ -1,3 +1,4 @@
+
 substitutions:
   name: "lsc-power-plug"
   friendly_name: "LSC Power Plug"
@@ -5,16 +6,13 @@ substitutions:
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
-  name_add_mac_suffix: true
 
   project:
     name: "wjtje.lsc-power-plug"
-    version: "1.0.0"
+    version: "1.0.1"
 
-dashboard_import:
-  package_import_url: github://wjtje/lsc-smart-connect-esphome/power-plug/power-plug-template.yaml@main
-  import_full_config: false
-
+# This external component is needed because of a bug in the upstream ESPHome repo
+# For more information goto: https://s.wjtje.dev/lscpowerpatch
 external_components:
   - source:
       type: git
@@ -23,23 +21,45 @@ external_components:
     components: [ pulse_counter ]
 
 api:
+  # ESPHome devices reboot after 15 minutes not connected to Home-Assistant
+  # Normally this is a pretty nice feature, especially for devices where you
+  # don't have physical access to them.
+  # But personally I didn't like this on power plugs so it's disabled by default/
+  reboot_timeout: 0s
+  # If you wan't encryption between this node and Home-Assistant, command out the
+  # following and generate a new key using: https://esphome.io/components/api
+  # encryption: 
+  #   key: 
 
 ota:
+  - platform: esphome
+  # Adding a OTA password can be a great way to improve the security of the device
+  # See: https://esphome.io/components/ota/esphome
+  # password: 
 
-# Setup a WIFI AP so the the user can setup the device
 wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # To give your node a static IP, use the following
+  # manual_ip:
+  #   static_ip: 192.168.0.123
+  #   gateway: 192.168.0.1
+  #   subnet: 255.255.255.0
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    password: "12345678"
+    ssid: ${friendly_name}
+    # This uses the same wifi password as you normal wifi
+    password: !secret wifi_password
 
 captive_portal:
-
-web_server:
-  port: 80
 
 bk72xx:
   board: cb2s
 
 # Enable logging (on LOG UART)
+# This UART is not easly accessable, but it's there if you want to use it
 logger:
   hardware_uart: UART2
 
